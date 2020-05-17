@@ -35,9 +35,15 @@ def welcome():
     )
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    results = session.query(Measurement.date, Measurement.prcp).\
+    results = session.query(measurement.date, measurement.prcp).\
         filter(measurement.date >= "2016-08-23").\
-        filter(measurement.date <= "2017-08-23").all()   
+        filter(measurement.date <= "2017-08-23").all()  
+    precipitation_dict = []
+    for row in results:
+        date_dict = {}
+        date_dict[row.date] = row.prcp
+        precipitation_dict.append(date_dict)
+    return jsonify(precipitation_dict) 
 
 @app.route("/api/v1.0/stations")
 def stations():
@@ -48,18 +54,10 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def tobs():
     results = session.query(measurement.tobs).\
-        filter(Measurement.date >= "2016-08-23").\
-        filter(Measurement.date <= "2017-08-23").all()
+        filter(measurement.date >= "2016-08-23").\
+        filter(measurement.date <= "2017-08-23").all()
     tobs_list = list(np.ravel(results))
     return jsonify(tobs_list)
-    
-    
-    precipitation_dict = []
-        for row in results:
-        date_dict = {}
-        date_dict[row.date] = row.prcp
-        precipitation_dict.append(date_dict)
-    return jsonify(precipitation_dict)
 
 if __name__ == '__main__':
     app.run(debug=True)
